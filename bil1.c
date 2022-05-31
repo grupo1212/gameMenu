@@ -11,19 +11,15 @@ typedef struct
 reg_jogador reg[max]; // vetor principal usado
 int findUser(char name[10], int untilPos);
 void ordenacao(int l);
-int export(FILE *f, int i);
-void save(FILE *f);
-void insertionSort(int value);
+int exportPlayers(char *path, int playersCount);
+int importPlayers(char *path);
+void insertionSort(reg_jogador player);
 void moveToRight(int pos);
+void moveToLeft(int pos);
 
 ////////////////////////
 int registro(int l)
 {
-    if (l >= max)
-    {
-        printf("-max de jogadores-\n");
-        return 1;
-    }
     char nomeaux[10];            // nome auxiliar
     int pontosaux, userRepeated; // ponto auxiliar e variavel para confirmar o return
     printf("nome e pontuacao\nnome=");
@@ -35,37 +31,33 @@ int registro(int l)
     userRepeated = findUser(nomeaux, l);
     if (userRepeated > -1)
     {
-        reg[userRepeated].pontos = pontosaux; // faz com q os pontos do registro ja existente ejao substituidos
-        insertionSort(pontosaux);
-        return 1;
+        moveToLeft(userRepeated);
     }
-
     // novo V
-    reg_jogador novUser = {pontosaux, " "};
+    reg_jogador novUser;
+    novUser.pontos = pontosaux;
     strcpy(novUser.nome, nomeaux);
-    reg[l] = novUser;
-    insertionSort(pontosaux);
-    return 0;
+    insertionSort(novUser);
+    if (exportPlayers("jogadores.txt", l+1) == -1) {
+        printf("Panic ERROR...");
+        exit(1);
+    }
+    return userRepeated+1;
 }
 //////////////////////////////////////////////////////////////////
-void rank(int l) // ordenacao
+void rank(int l)
 {
     int opc;
-    ordenacao(l);
-    printf("pos\tpontos\t\tnome\n");
-    FILE *f;
-    f = fopen("jogadores.txt", "w");
-
     for (int i = 0; i < l; i++)
     {
         printf("%d\t%d\t\t%s\n", i + 1, reg[i].pontos, reg[i].nome);
-        export(f, i);
     }
-    fclose(f);
+    //
     printf("deseja jogar com algum save ou criar novo jogo=");
     scanf("%d", &opc);
     if (opc == 1)
     {
+        registro(l);
     }
     else
     {
@@ -112,20 +104,52 @@ void ordenacao(int l)
     }
 }
 
-int export(FILE *f, int i)
+int exportPlayers(char *path, int playersCount)
 {
-    return fprintf(f, "%d %s ", reg[i].pontos, reg[i].nome);
+    FILE *pointerFile;
+    int result;
+    pointerFile = fopen(path,"w");
+    if (pointerFile == NULL) {
+        printf("error opening the file in path %s\n", path);
+        return -1;
+    }
+    result = fprintf(pointerFile, "%d %s %d %s %d %s %d",playersCount, reg[0].nome, reg[0].pontos, reg[1].nome, reg[1].pontos,reg[2].nome, reg[2].pontos);
+    if (result<0) {
+        printf("error writting in the file %s\n", path);
+        fclose(pointerFile);
+        return -1;
+    }
+    fclose(pointerFile);
+    return 1;
 }
 
-void insertionSort(int x)
+int importPlayers(char *path)
+{
+    FILE *pointerFile;
+    int playersCount;
+    pointerFile = fopen(path,"r");
+    if (pointerFile == NULL) {
+        printf("error opening the file in path %s\n", path);
+        return -1;
+    }
+    fscanf(pointerFile, "%d %s %d %s %d %s %d",&playersCount, &reg[0].nome, &reg[0].pontos, &reg[1].nome, &reg[1].pontos,&reg[2].nome, &reg[2].pontos);
+    if (playersCount > max) {
+        return 0;
+    }
+    fclose(pointerFile);
+
+    return playersCount;
+}
+
+void insertionSort(reg_jogador player)
 {
     for (int i = 0; i < max; i++)
     {
-        if (x > reg[i].pontos)
+        if (player.pontos > reg[i].pontos)
         {
             moveToRight(i);
-            reg[i].pontos = x;
-
+            reg[i].pontos = player.pontos;
+            strcpy(reg[i].nome, player.nome);
             return;
         }
     }
@@ -139,7 +163,14 @@ void moveToRight(int pos)
         strcpy(reg[i].nome, reg[i - 1].nome);
     }
 }
-void save(FILE *f)
+
+void moveToLeft(int pos)
 {
-    fscanf(f, "%d %s %d %s %d %s", reg[0].pontos, reg[0].nome, reg[1].pontos, reg[1].nome, reg[2].pontos, reg[2].nome);
+    for (int i = pos; i < max-1; i++)
+    {
+        reg[i].pontos = reg[i + 1].pontos;
+        strcpy(reg[i].nome, reg[i + 1].nome);
+    }
 }
+
+
