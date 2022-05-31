@@ -2,20 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include "bil.h"
+#define max 3 // limite de cadastro
 int main()
 {
-    FILE *f;
-    
-    f = fopen("jogadores.txt", "r");
-    if(f==NULL){
-        f = fopen("jogadores.txt", "w");
-    fclose(f);
-    }
-        save(f);
-    
-    fclose(f);
 
-    int opc, loop = 0;
+    int opc, loop = 0, resultImport;
+    resultImport = importPlayers("jogadores.txt");
+    if (resultImport<=0) {
+        printf("There is no players saved in external file jogadores.txt...\n");
+    } else {
+        loop = resultImport;
+    }
+    sleep(6);
+
     do
     {
         system("clear");
@@ -26,18 +25,11 @@ int main()
         switch (opc)
         {
         case 1:
-            if (loop < 3)
+            if (registro(loop) == 0 && loop<max) // caso o resgistro retorne como 0 ele add um loop
             {
-                if (registro(loop) == 0) // caso o resgistro retorne como 0 ele add um loop
-                {
-                    loop++;
-                }
-                printf("---Em construcao---\n");
+                loop++;
             }
-            else
-            {
-                printf("numero limite de jogador = 3\n");
-            }
+            printf("---Em construcao---\n");
             break;
         case 2:
             rank(loop); // mostrara o ranking do jogo ordenado
