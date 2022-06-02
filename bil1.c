@@ -55,6 +55,7 @@ void rank(int l)
     //
     printf("deseja jogar com algum save ou criar novo jogo=");
     scanf("%d", &opc);
+    getchar();
     if (opc == 1)
     {
         registro(l);
@@ -129,7 +130,7 @@ int importPlayers(char *path)
     int playersCount;
     pointerFile = fopen(path,"r");
     if (pointerFile == NULL) {
-        printf("error opening the file in path %s\n", path);
+        printf("Error opening the file in path %s\n", path);
         return -1;
     }
     fscanf(pointerFile, "%d %s %d %s %d %s %d",&playersCount, &reg[0].nome, &reg[0].pontos, &reg[1].nome, &reg[1].pontos,&reg[2].nome, &reg[2].pontos);
@@ -172,5 +173,4 @@ void moveToLeft(int pos)
         strcpy(reg[i].nome, reg[i + 1].nome);
     }
 }
-
 

@@ -3,6 +3,9 @@
 #include <string.h>
 #include "bil.h"
 #define max 3 // limite de cadastro
+
+//https://wokwi.com/projects/331464347467383379
+
 int main()
 {
 
@@ -38,8 +41,9 @@ int main()
             criadores();
             break;
         case 0:
+            printf("volte sempre");
             continue;
-            opc = 2;
+
         }
         printf("voltar=");
         scanf("%d", &opc);
